@@ -1,0 +1,3 @@
+[submodule "OpenWPM"]
+	path = OpenWPM
+	url = git@github.com:citp/OpenWPM.git
