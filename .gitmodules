@@ -1,3 +1,6 @@
 [submodule "OpenWPM"]
 	path = OpenWPM
 	url = git@github.com:citp/OpenWPM.git
+[submodule "analysis/crawl_utils"]
+	path = analysis/crawl_utils
+	url = git@github.com:englehardt/crawl_utils.git
