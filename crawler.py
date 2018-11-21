@@ -8,9 +8,9 @@ import crawl_utils as cu
 from OpenWPM.automation import CommandSequence, TaskManager
 
 NUM_BROWSERS = 15
-OUT_DIR = '2018-10-26_top_10k_stateless_js-content'
+OUTPUT_NAME = 'XXX'
 SITES = ['http://' + x for x in cu.get_top_1m(
-    os.path.expanduser('~/Desktop/%s/' % OUT_DIR))]
+    os.path.expanduser('~/Desktop/%s/' % OUTPUT_NAME))]
 
 manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
 
@@ -21,11 +21,11 @@ for i in range(NUM_BROWSERS):
     browser_params[i]['http_instrument'] = True
     browser_params[i]['headless'] = True
 
-manager_params['data_directory'] = '~/Desktop/%s/' % OUT_DIR
-manager_params['log_directory'] = '~/Desktop/%s/' % OUT_DIR
+manager_params['data_directory'] = '~/Desktop/%s/' % OUTPUT_NAME
+manager_params['log_directory'] = '~/Desktop/%s/' % OUTPUT_NAME
 manager_params['output_format'] = 's3'
 manager_params['s3_bucket'] = 'openwpm-crawls'
-manager_params['s3_directory'] = OUT_DIR
+manager_params['s3_directory'] = OUTPUT_NAME
 
 manager = TaskManager.TaskManager(manager_params, browser_params)
 for site in SITES[0:10000]:
