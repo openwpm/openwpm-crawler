@@ -12,4 +12,4 @@ runcmd:
  - cd /home/ubuntu/openwpm-crawler/OpenWPM
  - sudo sed -i "s/OUTPUT_NAME = 'XXX'/OUTPUT_NAME = '{}'/" /home/ubuntu/openwpm-crawler/{}
  - chown -R ubuntu:ubuntu /home/ubuntu
- - runuser -l ubuntu -c "cd /home/ubuntu/openwpm-crawler && screen -dm sh -c 'python {} >> ~/crawl_log.log'"
+ - runuser -l ubuntu -c "cd /home/ubuntu/openwpm-crawler && screen -dm sh -c 'python {} >> ~/crawl_log.log 2>&1'"
