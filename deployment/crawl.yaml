@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openwpm-crawl-2019-07-11
+spec:
+  # adjust for parallelism
+  parallelism: 10
+  template:
+    metadata:
+      name: openwpm-crawl
+    spec:
+      containers:
+      - name: openwpm
+        image: senglehardt/openwpm-deployment-test-1:latest
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-config
+              key: aws_access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-config
+              key: aws_secret_access_key
+        - name: CRAWL_DIRECTORY
+            value: 2019-07-11_top_1m_alexa
+        - name: REDIS_QUEUE_NAME
+            value: 2019-07-11_top_1m_alexa
+        - name: S3_BUCKET
+          value: openwpm-crawls
+        resources:
+          requests:
+            cpu: 750m
+          limits:
+            cpu: 1
+      restartPolicy: OnFailure

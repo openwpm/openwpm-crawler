@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openwpm-redis-test
+spec:
+  parallelism: 4
+  template:
+    metadata:
+      name: openwpm-redis-test
+    spec:
+      containers:
+      - name: c
+        image: englehardt/openwpm-redis-test:latest
+      restartPolicy: OnFailure
