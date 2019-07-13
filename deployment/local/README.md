@@ -4,34 +4,31 @@
 
 Install Docker and Kubernetes locally. Note that [Docker for Mac](https://docs.docker.com/docker-for-mac/install/) includes [Kubernetes](https://docs.docker.com/docker-for-mac/#kubernetes).
 
-Then run:
+For the remainder of these instructions, you are assumed to be in the `deployment/local/` folder with the Python venv activated (`source ../../venv/bin/activate`).
+
+Make sure that you have an up to date docker image of OpenWPM with openwpm-crawler support:
 
 ```
-cd ../../OpenWPM
-docker build -t openwpm .
-cd -
+cd ../../OpenWPM; docker build -t openwpm .; cd -
 ```
-
-For the remainder of these instructions, you are assumed to be in the `deployment/local/` folder.
 
 ## Set up a mock S3 service and a local redis server which we use for the work queue
 
 ```
 kubectl apply -f localstack.yaml
-python -m utils.setup_local_s3_bucket
+cd ../../; python -m utilities.setup_local_s3_bucket; cd -
 kubectl apply -f redis.yaml
 ```
 
 ## Adding sites to be crawled to the queue
 
 ```
-python -m utils.load_site_list_into_redis
+cd ../../; python -m utilities.load_site_list_into_redis; cd -
 ```
 
 (Optional) To inspect the current queue:
 ```
-kubectl delete pod temp
-kubectl run --generator=run-pod/v1 -i --tty temp --image redis --command "/bin/bash"
+kubectl attach temp -c temp -i -t || kubectl run --generator=run-pod/v1 -i --tty temp --image redis --command "/bin/bash"
 redis-cli -h redis
 lrange crawl-queue 0 -1
 ```
@@ -58,7 +55,7 @@ kubectl describe job local-crawl
 
 ```
 mkdir -p local-crawl-results/logs
-for POD in $(kubectl get pods --selector=job-name=local-crawl | grep -v NAME | awk '{ print $1 }')
+for POD in $(kubectl get pods --selector=job-name=local-crawl | grep -v NAME | grep -v Terminating | awk '{ print $1 }')
 do
     kubectl logs $POD > local-crawl-results/logs/$POD.log
 done
@@ -70,7 +67,7 @@ The crawl logs will end up in `./local-crawl-results/logs`
 
 When it has completed, run:
 ```
-python -m utils.download_files_from_local_s3
+cd ../../; python -m utilities.download_files_from_local_s3; cd -
 ```
 
 The crawl data will end up in Parquet format in `./local-crawl-results/data`

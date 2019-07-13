@@ -1,9 +1,9 @@
 import redis
 
 
-sites = ['http://www.example.com',
-         'http://www.princeton.edu',
-         'http://citp.princeton.edu/']
+sites = ['1,http://www.example.com',
+         '2,http://www.princeton.edu',
+         '3,http://citp.princeton.edu/']
 
 r = redis.Redis(host='localhost', port=31000, db=0)
 

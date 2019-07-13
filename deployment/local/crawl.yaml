@@ -11,9 +11,8 @@ spec:
     spec:
       containers:
       - name: openwpm-crawl
-        image: openwpm-dev
-        # allows for use of a locally built/tagged docker image
-        imagePullPolicy: Never
+        image: openwpm
+        imagePullPolicy: Never # allows use of a locally built/tagged docker image
         env:
         - name: AWS_ACCESS_KEY_ID
           value: 'foo'
@@ -22,7 +21,7 @@ spec:
         - name: NUM_BROWSERS
           value: '1'
         - name: REDIS_QUEUE_NAME
-          value: 'local-crawl-queue'
+          value: 'crawl-queue'
         - name: CRAWL_DIRECTORY
           value: 'openwpm-crawl'
         - name: S3_BUCKET
@@ -38,7 +37,7 @@ spec:
         - name: JS_INSTRUMENT
           value: '1'
         - name: SAVE_JAVASCRIPT
-          value: '1'
+          value: '0'
         - name: DWELL_TIME
           value: '10'
         - name: TIMEOUT

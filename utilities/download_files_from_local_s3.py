@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import os
 import boto3
-from utils.use_local_s3_service import use_local_s3_service
+from utilities.use_local_s3_service import use_local_s3_service
 
 
 def download_s3_directory(dir, destination='/tmp', bucket='your_bucket'):

@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: openwpm-crawl-2019-07-11
+  name: openwpm-crawl
 spec:
   # adjust for parallelism
   parallelism: 10
@@ -23,12 +23,28 @@ spec:
             secretKeyRef:
               name: aws-config
               key: aws_secret_access_key
-        - name: CRAWL_DIRECTORY
-            value: 2019-07-11_top_1m_alexa
+        - name: NUM_BROWSERS
+          value: '1'
         - name: REDIS_QUEUE_NAME
-            value: 2019-07-11_top_1m_alexa
+          value: '2019-07-11_top_1m_alexa'
+        - name: CRAWL_DIRECTORY
+          value: '2019-07-11_top_1m_alexa'
         - name: S3_BUCKET
-          value: openwpm-crawls
+          value: 'openwpm-crawls'
+        - name: HTTP_INSTRUMENT
+          value: '1'
+        - name: COOKIE_INSTRUMENT
+          value: '1'
+        - name: NAVIGATION_INSTRUMENT
+          value: '1'
+        - name: JS_INSTRUMENT
+          value: '1'
+        - name: SAVE_JAVASCRIPT
+          value: '1'
+        - name: DWELL_TIME
+          value: '10'
+        - name: TIMEOUT
+          value: '60'
         resources:
           requests:
             cpu: 750m
