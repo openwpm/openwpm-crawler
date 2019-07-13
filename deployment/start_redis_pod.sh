@@ -7,10 +7,8 @@ if [[ $# -lt 1 ]]; then
 fi
 CRAWL_NAME=$1
 
-echo -e "\nStarting redis pod..."
-kubectl apply -f ./redis-pod.yaml
-echo -e "\nStarting redis service..."
-kubectl apply -f ./redis-service.yaml
+echo -e "\nStarting redis..."
+kubectl apply -f ./redis.yaml
 
 echo -e "\nDownloading and unzipping site list..."
 wget http://s3.amazonaws.com/alexa-static/top-1m.csv.zip
