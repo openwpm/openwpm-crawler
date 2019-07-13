@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: local-crawl
+spec:
+  # adjust for parallelism
+  parallelism: 2
+  template:
+    metadata:
+      name: openwpm-crawl
+    spec:
+      containers:
+      - name: openwpm-crawl
+        image: openwpm-dev
+        # allows for use of a locally built/tagged docker image
+        imagePullPolicy: Never
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          value: 'foo'
+        - name: AWS_SECRET_ACCESS_KEY
+          value: 'foo'
+        - name: NUM_BROWSERS
+          value: '1'
+        - name: REDIS_QUEUE_NAME
+          value: 'local-crawl-queue'
+        - name: CRAWL_DIRECTORY
+          value: 'openwpm-crawl'
+        - name: S3_BUCKET
+          value: 'localstack-foo'
+        - name: S3_ENDPOINT
+          value: 'http://localstack:4572'
+        - name: HTTP_INSTRUMENT
+          value: '1'
+        - name: COOKIE_INSTRUMENT
+          value: '1'
+        - name: NAVIGATION_INSTRUMENT
+          value: '1'
+        - name: JS_INSTRUMENT
+          value: '1'
+        - name: SAVE_JAVASCRIPT
+          value: '1'
+        - name: DWELL_TIME
+          value: '10'
+        - name: TIMEOUT
+          value: '60'
+      restartPolicy: OnFailure

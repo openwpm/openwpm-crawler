@@ -1,1 +1,4 @@
 requests
+boto3
+localstack
+redis

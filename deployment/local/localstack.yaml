@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: localstack
+  labels:
+    app: localstack
+spec:
+  containers:
+    - name: localstack
+      image: localstack/localstack:0.9.5
+      env:
+          # with the SERVICES environment variable, you can tell LocalStack
+          # what services to expose on what port
+        - name: SERVICES
+          value: "s3:4572"
+        - name: PORT_WEB_UI
+          value: "8080"
+      ports:
+      # exposing the localstack ui
+      - containerPort: 8080
+      # exposing s3
+      - containerPort: 4572
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: localstack
+spec:
+  selector:
+    app: localstack
+  ports:
+  - port: 8080
+    protocol: TCP
+    name: ui
+    targetPort: 8080
+    nodePort: 32000
+  - port: 4572
+    protocol: TCP
+    name: s3
+    targetPort: 4572
+    nodePort: 32001
+  type: NodePort
