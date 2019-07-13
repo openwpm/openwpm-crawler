@@ -1,6 +1,7 @@
 [submodule "OpenWPM"]
 	path = OpenWPM
-	url = https://github.com/englehardt/OpenWPM.git
+	url = https://github.com/mozilla/OpenWPM.git
+	branch = openwpm-crawler-support
 [submodule "analysis/crawl_utils"]
 	path = analysis/crawl_utils
 	url = https://github.com/englehardt/crawl_utils.git
