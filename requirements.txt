@@ -4,3 +4,4 @@ localstack
 redis
 pyarrow
 s3fs
+s3cmd

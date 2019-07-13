@@ -67,7 +67,7 @@ The crawl logs will end up in `./local-crawl-results/logs`
 
 When it has completed, run:
 ```
-cd ../../; python -m utilities.download_files_from_local_s3; cd -
+s3cmd --verbose --access_key=foo --secret_key=foo --host=http://localhost:32001 --host-bucket=localhost --no-ssl sync --delete-removed s3://localstack-foo local-crawl-results/data
 ```
 
 The crawl data will end up in Parquet format in `./local-crawl-results/data`
@@ -75,6 +75,8 @@ The crawl data will end up in Parquet format in `./local-crawl-results/data`
 ### Clean up created pods, services and local artifacts
 
 ```
+mkdir /tmp/empty
+s3cmd --verbose --access_key=foo --secret_key=foo --host=http://localhost:32001 --host-bucket=localhost --no-ssl sync --delete-removed --force /tmp/empty/ s3://localstack-foo
 kubectl delete -f localstack.yaml
 kubectl delete -f redis.yaml
 kubectl delete -f crawl.yaml
