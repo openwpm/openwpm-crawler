@@ -16,7 +16,6 @@ cd ../../OpenWPM; docker build -t openwpm .; cd -
 
 ```
 kubectl apply -f localstack.yaml
-cd ../../; python -m utilities.setup_local_s3_bucket; cd -
 kubectl apply -f redis.yaml
 ```
 
