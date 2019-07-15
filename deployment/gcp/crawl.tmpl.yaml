@@ -4,7 +4,7 @@ metadata:
   name: openwpm-crawl
 spec:
   # adjust for parallelism
-  parallelism: 10
+  parallelism: 100
   template:
     metadata:
       name: openwpm-crawl
