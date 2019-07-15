@@ -1,10 +1,14 @@
 # Run a local OpenWPM crawl using Kubernetes
 
-## Preparations
+Documentation and scripts to launch an OpenWPM crawl on a Kubernetes cluster locally.
+
+## Prerequisites
 
 Install Docker and Kubernetes locally. Note that [Docker for Mac](https://docs.docker.com/docker-for-mac/install/) includes [Kubernetes](https://docs.docker.com/docker-for-mac/#kubernetes).
 
 For the remainder of these instructions, you are assumed to be in the `deployment/local/` folder with the Python venv activated (`source ../../venv/bin/activate`).
+
+## Build Docker image
 
 Make sure that you have an up to date docker image of OpenWPM with openwpm-crawler support:
 
@@ -12,17 +16,35 @@ Make sure that you have an up to date docker image of OpenWPM with openwpm-crawl
 cd ../../OpenWPM; docker build -t openwpm .; cd -
 ```
 
-## Set up a mock S3 service and a local redis server which we use for the work queue
+## Set up a mock S3 service
 
 ```
 kubectl apply -f localstack.yaml
+```
+
+## Deploy the redis server which we use for the work queue
+
+```
 kubectl apply -f redis.yaml
 ```
 
 ## Adding sites to be crawled to the queue
 
+Create a comma-separated site list as per:
+
 ```
-cd ../../; python -m utilities.load_site_list_into_redis; cd -
+echo "1,http://www.example.com
+2,http://www.example.org
+3,http://www.princeton.edu
+4,http://citp.princeton.edu/" > site_list.csv
+
+../load_site_list_into_redis.sh crawl-queue site_list.csv 
+```
+
+(Optional) To load Alexa Top 1M into redis:
+
+```
+../load_alexa_top_1m_site_list_into_redis.sh crawl-queue site_list.csv 
 ```
 
 (Optional) To inspect the current queue:
@@ -34,9 +56,23 @@ lrange crawl-queue 0 -1
 
 ## Deploying the crawl Job
 
+Since each crawl is unique, you need to configure your `crawl.yaml` deployment configuration. We have provided a template to start from:
+```
+cp crawl.tmpl.yaml crawl.yaml
+```
+
+- Update `crawl.yaml`. This may include:
+    - spec.parallelism
+    - spec.containers.image
+    - spec.containers.env
+
+When you are ready, deploy the crawl:
+
 ```
 kubectl create -f crawl.yaml
 ```
+
+Note that for the remainder of these instructions, `metadata.name` is assumed to be set to `local-crawl`.
 
 ### Monitor Job
 
@@ -49,6 +85,8 @@ watch kubectl get pods --selector=job-name=local-crawl
 ```
 kubectl describe job local-crawl
 ```
+
+(Optional) You can also spin up the Kubernetes Dashboard UI as per [these instructions](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/#deploying-the-dashboard-ui).
 
 ### View Job logs
 

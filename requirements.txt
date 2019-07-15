@@ -1,7 +1,3 @@
 requests
-boto3
-localstack
 redis
-pyarrow
-s3fs
 s3cmd

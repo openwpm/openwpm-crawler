@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-CLUSTER_NAME=crawl1
+if [[ $# -lt 1 ]]; then
+    echo "Usage: start_gke_cluster.sh cluster_name" >&2
+    exit 1
+fi
+CLUSTER_NAME=$1
 
 gcloud container clusters create $CLUSTER_NAME \
 --zone us-central1-f \
@@ -15,5 +19,3 @@ gcloud container clusters create $CLUSTER_NAME \
 --enable-autoscaling \
 --min-cpu-platform="Intel Broadwell" \
 --preemptible
-
-gcloud container clusters get-credentials $CLUSTER_NAME
