@@ -9,5 +9,11 @@ pip install --upgrade pip
 # Install requirements
 pip install -U -r requirements.txt
 
+# Install analysis requirements
+pip install -U -r analysis/utils/requirements.txt
+
+# Update the corresponding Jupyter kernel
+ipython kernel install --user --name=openwpm-crawler
+
 echo "* Success: To activate the python venv, run"
 echo "    source venv/bin/activate"
