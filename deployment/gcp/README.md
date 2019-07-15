@@ -98,13 +98,6 @@ source ../../venv/bin/activate
 cd ../../; python -m utilities.get_sampled_sites; cd -
 ```
 
-(Optional) To inspect the current queue:
-```
-kubectl attach temp -c temp -i -t || kubectl run --generator=run-pod/v1 -i --tty temp --image redis --command "/bin/bash"
-redis-cli -h redis
-lrange crawl-queue 0 -1
-```
-
 ## Deploying the crawl Job
 
 Since each crawl is unique, you need to configure your `crawl.yaml` deployment configuration. We have provided a template to start from:
@@ -128,6 +121,31 @@ Note that for the remainder of these instructions, `metadata.name` is assumed to
 
 ### Monitor Job
 
+#### Queue status
+
+Open a temporary instance and launch redis-cli:
+```
+kubectl attach temp -c temp -i -t || kubectl run --generator=run-pod/v1 -i --tty temp --image redis --command "/bin/bash"
+redis-cli -h redis
+```
+
+Current length of the queue:
+```
+llen crawl-queue
+```
+
+Amount of queue items marked as processing:
+```
+llen crawl-queue:processing 
+```
+
+Contents of the queue:
+```
+lrange crawl-queue 0 -1
+```
+
+#### Job status
+
 ```
 watch kubectl get pods --selector=job-name=openwpm-crawl
 ```
@@ -140,7 +158,7 @@ kubectl describe job openwpm-crawl
 
 Also, check out the [GCP GKE Console](https://console.cloud.google.com/kubernetes/workload)
 
-### View Job logs
+#### View Job logs
 
 ```
 mkdir -p openwpm-crawl-results/logs
@@ -157,7 +175,7 @@ The crawl logs will end up in `./openwpm-crawl-results/logs`
 - Visit [GCP Logging Console](https://console.cloud.google.com/logs/viewer)
 - Select `GKE Container`
 
-### Using the Kubernetes Dashboard UI
+#### Using the Kubernetes Dashboard UI
 
 (Optional) You can also spin up the Kubernetes Dashboard UI as per [these instructions](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/#deploying-the-dashboard-ui) which will allow for easy access to status and logs related to running jobs/crawls.
 
