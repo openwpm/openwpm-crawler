@@ -6,7 +6,7 @@ Documentation and scripts to launch an OpenWPM crawl on a Kubernetes cluster loc
 
 Install Docker and Kubernetes locally. Note that [Docker for Mac](https://docs.docker.com/docker-for-mac/install/) includes [Kubernetes](https://docs.docker.com/docker-for-mac/#kubernetes).
 
-For the remainder of these instructions, you are assumed to be in the `deployment/local/` folder with the Python venv activated (`source ../../venv/bin/activate`).
+For the remainder of these instructions, you are assumed to be in the `deployment/local/` folder.
 
 ## Build Docker image
 
@@ -45,6 +45,12 @@ echo "1,http://www.example.com
 
 ```
 ../load_alexa_top_1m_site_list_into_redis.sh crawl-queue site_list.csv 
+```
+
+(Optional) Use some of the `../../utilities/crawl_utils.py` code. For instance, to fetch and store a sample of Alexa Top 1M to `/tmp/sampled_sites.json`:
+```
+source ../../venv/bin/activate
+cd ../../; python -m utilities.get_sampled_sites; cd -
 ```
 
 (Optional) To inspect the current queue:

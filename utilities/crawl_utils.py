@@ -1,5 +1,5 @@
 """ A collection of utilities for crawl scripts """
-from StringIO import StringIO
+from io import BytesIO
 import requests
 import zipfile
 import random
@@ -22,17 +22,18 @@ def get_top_1m(location):
     if not os.path.isfile(site_list):
         print("%s does not exist, downloading a copy." % site_list)
         resp = requests.get(ALEXA_LIST)
-        with zipfile.ZipFile(StringIO(resp.content), 'r') as zpf:
+        print(resp)
+        with zipfile.ZipFile(BytesIO(resp.content), 'r') as zpf:
             contents = zpf.read(zpf.infolist()[0])
         if not os.path.isdir(location):
             os.makedirs(location)
-        with open(site_list, 'w') as f:
+        with open(site_list, 'wb') as f:
             f.write(contents)
     else:
-        with open(site_list, 'r') as f:
+        with open(site_list, 'rb') as f:
             contents = f.read()
 
-    return [x.split(',')[-1] for x in contents.split('\n')]
+    return [x.split(',')[-1] for x in contents.decode('utf8').split('\n')]
 
 
 def get_sampled_sites(location, include_rank=False,

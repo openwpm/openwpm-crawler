@@ -92,6 +92,12 @@ echo "1,http://www.example.com
 ../load_alexa_top_1m_site_list_into_redis.sh crawl-queue site_list.csv 
 ```
 
+(Optional) Use some of the `../../utilities/crawl_utils.py` code. For instance, to fetch and store a sample of Alexa Top 1M to `/tmp/sampled_sites.json`:
+```
+source ../../venv/bin/activate
+cd ../../; python -m utilities.get_sampled_sites; cd -
+```
+
 (Optional) To inspect the current queue:
 ```
 kubectl attach temp -c temp -i -t || kubectl run --generator=run-pod/v1 -i --tty temp --image redis --command "/bin/bash"
