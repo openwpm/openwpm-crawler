@@ -19,6 +19,7 @@ For the remainder of these instructions, you are assumed to be in the `deploymen
 
 ### Configure the GCP Project
 
+- `gcloud login` to authenticate with GCP.
 - `gcloud config set project $PROJECT` to the project that was created.
 - `gcloud config set compute/zone us-central1-f` to the default region you want resources to be provisioned.
     - [GCP Regions](https://cloud.google.com/compute/docs/regions-zones/) for current list of regions.
@@ -26,7 +27,9 @@ For the remainder of these instructions, you are assumed to be in the `deploymen
 
 ### Setup GKE Cluster
 
-The following command will create a zonal GKE cluster with [preemptible](https://cloud.google.com/preemptible-vms/) nodes. You may want to adjust fields within `./start_gke_cluster.sh` where appropriate such as:
+The following command will create a zonal GKE cluster with [preemptible](https://cloud.google.com/preemptible-vms/) [n1-highcpu-16](https://cloud.google.com/compute/all-pricing) nodes ($0.1200/node/h).
+
+You may want to adjust fields within `./start_gke_cluster.sh` where appropriate such as:
 - num-nodes, min-nodes, max-nodes
 - [machine-type](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
 - See the [GKE Quickstart](https://cloud.google.com/kubernetes-engine/docs/quickstart) guide and [cluster create](https://cloud.google.com/sdk/gcloud/reference/container/clusters/create) documentation.
@@ -41,7 +44,7 @@ The following command will create a zonal GKE cluster with [preemptible](https:/
 gcloud container clusters get-credentials crawl1
 ```
 
-This allows subsequent `kubectl` commands to interact with our cluster.
+This allows subsequent `kubectl` commands to interact with our cluster (using the context `gke_{PROJECT}_{ZONE}_{CLUSTER_NAME}`)
 
 ## Build Docker image
 
@@ -56,12 +59,21 @@ cd ../../OpenWPM; docker build -t openwpm .; cd -
 This makes it accessible to the cluster.
 
 ```
-gcloud docker -- push gcr.io/$PROJECT/openwpm`
+gcloud auth configure-docker
+docker tag openwpm gcr.io/$PROJECT/openwpm
+docker push gcr.io/$PROJECT/openwpm
 ```
 
 ## Allow the cluster to access AWS S3
 
-Make sure that your AWS credentials are stored in `~/.aws/credentials`, then run:
+Make sure that your AWS credentials are stored in `~/.aws/credentials` as per:
+
+```
+aws_access_key_id = FOO
+aws_secret_access_key = BAR
+```
+
+Then run:
 
 ```
 ./aws_credentials_as_kubectl_secrets.sh
@@ -98,7 +110,7 @@ source ../../venv/bin/activate
 cd ../../; python -m utilities.get_sampled_sites; cd -
 ```
 
-## Deploying the crawl Job
+## Start the crawl
 
 Since each crawl is unique, you need to configure your `crawl.yaml` deployment configuration. We have provided a template to start from:
 ```
@@ -119,7 +131,7 @@ kubectl create -f crawl.yaml
 
 Note that for the remainder of these instructions, `metadata.name` is assumed to be set to `openwpm-crawl`.
 
-### Monitor Job
+### Monitor the crawl
 
 #### Queue status
 
@@ -144,9 +156,13 @@ Contents of the queue:
 lrange crawl-queue 0 -1
 ```
 
-#### Job status
+#### OpenWPM progress and logs
 
+Check out the [GCP GKE Console](https://console.cloud.google.com/kubernetes/workload)
+
+Also:
 ```
+watch kubectl top pods --selector=job-name=openwpm-crawl
 watch kubectl get pods --selector=job-name=openwpm-crawl
 ```
 
@@ -155,20 +171,6 @@ watch kubectl get pods --selector=job-name=openwpm-crawl
 ```
 kubectl describe job openwpm-crawl
 ```
-
-Also, check out the [GCP GKE Console](https://console.cloud.google.com/kubernetes/workload)
-
-#### View Job logs
-
-```
-mkdir -p openwpm-crawl-results/logs
-for POD in $(kubectl get pods --selector=job-name=openwpm-crawl | grep -v NAME | grep -v Terminating | awk '{ print $1 }')
-do
-    kubectl logs $POD > openwpm-crawl-results/logs/$POD.log
-done
-```
-
-The crawl logs will end up in `./openwpm-crawl-results/logs`
 
 #### View Job logs via GCP Stackdriver Logging Interface
 
@@ -189,7 +191,6 @@ The crawl data will end up in Parquet format in the S3 bucket that you configure
 kubectl delete -f redis.yaml
 kubectl delete -f crawl.yaml
 kubectl delete pod temp
-rm -r openwpm-crawl-results/logs
 ```
 
 ### Deleting the GKE Cluster
