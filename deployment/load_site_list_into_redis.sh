@@ -13,8 +13,8 @@ echo -e "\nEnqueuing site list in redis"
 # Make sure to clear the queue before adding our site list
 echo "DEL $REDIS_QUEUE_NAME" > joblist.txt
 
-# Add site list
-cat "$SITE_LIST_CSV" | sed "s/^/RPUSH $REDIS_QUEUE_NAME /" >> joblist.txt
+# Add site list in reverse order since the queue gets worked upon from the bottom up
+tail -r "$SITE_LIST_CSV" | sed "s/^/RPUSH $REDIS_QUEUE_NAME /" >> joblist.txt
 kubectl cp joblist.txt redis-master:/tmp/joblist.txt
 kubectl exec redis-master -- sh -c "cat /tmp/joblist.txt | redis-cli --pipe"
 
