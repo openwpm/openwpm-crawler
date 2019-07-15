@@ -12,6 +12,8 @@ spec:
       containers:
       - name: openwpm-crawl
         image: openwpm
+        command: ["python"]
+        args: ["crawler.py"]
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
