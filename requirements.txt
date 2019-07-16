@@ -1,1 +1,6 @@
 requests
+redis
+s3cmd
+
+# for analysis
+ipykernel

@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openwpm-crawl
+spec:
+  # adjust for parallelism
+  parallelism: 100
+  template:
+    metadata:
+      name: openwpm-crawl
+    spec:
+      containers:
+      - name: openwpm-crawl
+        image: openwpm
+        command: ["python"]
+        args: ["crawler.py"]
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-config
+              key: aws_access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-config
+              key: aws_secret_access_key
+        - name: NUM_BROWSERS
+          value: '1'
+        - name: REDIS_QUEUE_NAME
+          value: 'crawl-queue'
+        - name: CRAWL_DIRECTORY
+          value: 'openwpm-crawl'
+        - name: S3_BUCKET
+          value: 'openwpm-crawls'
+        - name: HTTP_INSTRUMENT
+          value: '1'
+        - name: COOKIE_INSTRUMENT
+          value: '1'
+        - name: NAVIGATION_INSTRUMENT
+          value: '1'
+        - name: JS_INSTRUMENT
+          value: '1'
+        - name: SAVE_JAVASCRIPT
+          value: '1'
+        - name: DWELL_TIME
+          value: '10'
+        - name: TIMEOUT
+          value: '60'
+        resources:
+          requests:
+            cpu: 750m
+          limits:
+            cpu: 1
+      restartPolicy: OnFailure
