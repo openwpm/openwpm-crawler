@@ -48,6 +48,9 @@ spec:
         - name: TIMEOUT
           value: '60'
         resources:
+          # these are taken at face value by the autoscaler, so they should match actual
+          # resources required by any single instance/container as good as possible
+          # see: https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler
           requests:
             cpu: 750m
           limits:
