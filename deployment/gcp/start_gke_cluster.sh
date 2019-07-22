@@ -13,7 +13,7 @@ gcloud container clusters create $CLUSTER_NAME \
 --enable-cloud-monitoring \
 --labels='app=openwpm' \
 --machine-type=n1-highcpu-16 \
---num-nodes=5 \
+--num-nodes=1 \
 --min-nodes=0 \
 --max-nodes=30 \
 --enable-autoscaling \
