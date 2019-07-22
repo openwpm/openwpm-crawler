@@ -12,6 +12,7 @@ echo -e "\nEnqueuing site list in redis"
 
 # Make sure to clear the queue before adding our site list
 echo "DEL $REDIS_QUEUE_NAME" > joblist.txt
+echo "DEL $REDIS_QUEUE_NAME:processing" >> joblist.txt
 
 # Add site list in reverse order since the queue gets worked upon from the bottom up
 tail -r "$SITE_LIST_CSV" | sed "s/^/RPUSH $REDIS_QUEUE_NAME /" >> joblist.txt
