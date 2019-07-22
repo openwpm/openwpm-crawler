@@ -2,7 +2,7 @@
 
 Launch OpenWPM crawls using Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/) workloads to run the crawl.
 
-The OpenWPM crawler.py script will continuously fetch sites to run and exit once there are no additional sites in the queue.
+A Redis work queue is set up and loaded with the list of URLs to crawl. Containers in the Kubernetes job runs the OpenWPM crawler.py script which will continuously fetch sites to run and exit once there are no additional sites in the queue.
 
 ## Preparations
 

@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: openwpm-crawl
-        image: openwpm
+        image: docker.io/openwpm/openwpm:latest
         command: ["python"]
         args: ["crawler.py"]
         env:

@@ -10,7 +10,7 @@ For the remainder of these instructions, you are assumed to be in the `deploymen
 
 ## Build Docker image
 
-Make sure that you have an up to date docker image of OpenWPM with openwpm-crawler support:
+Make sure that you have an up to date docker image locally:
 
 ```
 cd ../../OpenWPM; docker build -t openwpm .; cd -
@@ -96,6 +96,17 @@ llen crawl-queue:processing
 Contents of the queue:
 ```
 lrange crawl-queue 0 -1
+lrange crawl-queue:processing 0 -1
+```
+
+#### Using the Redis Commander UI
+
+(Optional) You can alternatively use [a web UI](https://github.com/joeferner/redis-commander) to inspect the contents of the queue:
+```
+kubectl apply -f https://raw.githubusercontent.com/motin/redis-commander/issue-360/k8s/redis-commander/deployment.yaml
+kubectl apply -f https://raw.githubusercontent.com/motin/redis-commander/issue-360/k8s/redis-commander/service.yaml
+kubectl port-forward svc/redis-commander 8081:8081
+open http://localhost:8081/
 ```
 
 #### Job status
@@ -128,6 +139,7 @@ The crawl logs will end up in `./local-crawl-results/logs`
 
 ### Inspecting crawl results
 
+When it has completed, run:
 ```
 s3cmd --verbose --access_key=foo --secret_key=foo --host=http://localhost:32001 --host-bucket=localhost --no-ssl sync --delete-removed s3://localstack-foo local-crawl-results/data
 ```
@@ -139,9 +151,9 @@ The crawl data will end up in Parquet format in `./local-crawl-results/data`
 ```
 mkdir /tmp/empty
 s3cmd --verbose --access_key=foo --secret_key=foo --host=http://localhost:32001 --host-bucket=localhost --no-ssl sync --delete-removed --force /tmp/empty/ s3://localstack-foo
+kubectl delete -f crawl.yaml
 kubectl delete -f localstack.yaml
 kubectl delete -f redis.yaml
-kubectl delete -f crawl.yaml
 kubectl delete pod temp
 rm -r local-crawl-results/data
 rm -r local-crawl-results/logs
