@@ -23,7 +23,7 @@ export PROJECT="foo-sandbox"
 
 ### Configure the GCP Project
 
-- `gcloud login` to authenticate with GCP.
+- `gcloud auth login` to authenticate with GCP.
 - `gcloud config set project $PROJECT` to the project that was created.
 - `gcloud config set compute/zone us-central1-f` to the default region you want resources to be provisioned.
     - [GCP Regions](https://cloud.google.com/compute/docs/regions-zones/) for current list of regions.
@@ -97,7 +97,14 @@ echo "1,http://www.example.com
 (Optional) To load Alexa Top 1M into redis:
 
 ```
-../load_alexa_top_1m_site_list_into_redis.sh crawl-queue site_list.csv 
+cd ..; ./load_alexa_top_1m_site_list_into_redis.sh crawl-queue; cd -
+```
+
+You can also specify a max rank to load into the queue. For example, to add the
+top 1000 sites from the Alexa Top 1M list:
+
+```
+cd ..; ./load_alexa_top_1m_site_list_into_redis.sh crawl-queue 1000; cd -
 ```
 
 (Optional) Use some of the `../../utilities/crawl_utils.py` code. For instance, to fetch and store a sample of Alexa Top 1M to `/tmp/sampled_sites.json`:

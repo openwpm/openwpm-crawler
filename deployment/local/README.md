@@ -4,9 +4,24 @@ Documentation and scripts to launch an OpenWPM crawl on a Kubernetes cluster loc
 
 ## Prerequisites
 
-Install Docker and Kubernetes locally. Note that [Docker for Mac](https://docs.docker.com/docker-for-mac/install/) includes [Kubernetes](https://docs.docker.com/docker-for-mac/#kubernetes).
+Install Docker and Kubernetes locally. Note that
+[Docker for Mac](https://docs.docker.com/docker-for-mac/install/) includes
+[Kubernetes](https://docs.docker.com/docker-for-mac/#kubernetes). Depending on
+your platform you may also need to install a local cluster (.e.g,
+[Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/).
 
 For the remainder of these instructions, you are assumed to be in the `deployment/local/` folder.
+
+## Ensure cluster is running
+
+```
+$ kubectl cluster-info
+Kubernetes master is running at https://...
+KubeDNS is running at https://...
+```
+
+If a cluster isn't running and you're using Minikube as your local cluster,
+you can start it by running `minikube start`.
 
 ## Build Docker image
 
