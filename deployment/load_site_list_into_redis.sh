@@ -15,7 +15,7 @@ echo "DEL $REDIS_QUEUE_NAME" > joblist.txt
 echo "DEL $REDIS_QUEUE_NAME:processing" >> joblist.txt
 
 # Add site list in reverse order since the queue gets worked upon from the bottom up
-tail -r "$SITE_LIST_CSV" | sed "s/^/RPUSH $REDIS_QUEUE_NAME /" >> joblist.txt
+cat "$SITE_LIST_CSV" | sed '1!G;h;$!d' | sed "s/^/RPUSH $REDIS_QUEUE_NAME /" >> joblist.txt
 kubectl cp joblist.txt redis-master:/tmp/joblist.txt
 kubectl exec redis-master -- sh -c "cat /tmp/joblist.txt | redis-cli --pipe"
 
