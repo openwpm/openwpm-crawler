@@ -128,6 +128,23 @@ cp crawl.tmpl.yaml crawl.yaml
 
 Note: A useful naming convention for `CRAWL_DIRECTORY` is `YYYY-MM-DD_description_of_the_crawl`.
 
+## (Optional) Configure sentry credentials
+
+Set the Sentry DSN as a kubectl secret (change `foo` below):
+```
+kubectl create secret generic sentry-config \
+--from-literal=sentry_dsn=foo
+```
+
+To run crawls without Sentry, remove the following from the crawl config:
+```
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: sentry-config
+              key: sentry_dsn
+```
+
 ## Start the crawl
 
 When you are ready, deploy the crawl:

@@ -47,6 +47,11 @@ spec:
           value: '10'
         - name: TIMEOUT
           value: '60'
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: sentry-config
+              key: sentry_dsn
         resources:
           # these are taken at face value by the autoscaler, so they should match actual
           # resources required by any single instance/container as good as possible
