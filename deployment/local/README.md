@@ -28,7 +28,16 @@ you can start it by running `minikube start`.
 Make sure that you have an up to date docker image locally:
 
 ```
-cd ../../OpenWPM; docker build -t openwpm .; cd -
+docker pull openwpm/openwpm
+docker tag openwpm/openwpm openwpm
+```
+
+Alternatively, you can build the image from a local OpenWPM code repository:
+
+```
+cd path/to/OpenWPM
+docker build -t openwpm .
+cd -
 ```
 
 ## Set up a mock S3 service

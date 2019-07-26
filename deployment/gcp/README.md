@@ -88,11 +88,13 @@ Then run:
 ./aws_credentials_as_kubectl_secrets.sh
 ```
 
-## Build and push Docker image to GCR
+## (Optional) Build and push Docker image to GCR
 
-(Optional) If one of [the pre-built OpenWPM Docker images](https://hub.docker.com/r/openwpm/openwpm/tags) are not sufficient:
+If one of [the pre-built OpenWPM Docker images](https://hub.docker.com/r/openwpm/openwpm/tags) are not sufficient:
 ```
-cd ../openwpm-crawler/OpenWPM; docker build -t gcr.io/$PROJECT/openwpm .; cd -
+cd path/to/OpenWPM
+docker build -t gcr.io/$PROJECT/openwpm .
+cd -
 gcloud auth configure-docker
 docker push gcr.io/$PROJECT/openwpm
 ```
