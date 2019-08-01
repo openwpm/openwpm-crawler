@@ -100,12 +100,17 @@ Remember to change the `crawl.yaml` to point to `image: gcr.io/$PROJECT/openwpm`
 
 ## Deploy the redis server which we use for the work queue
 
-This will launch a 1GB Basic tier Google Cloud Memorystore for Redis instance ($0.049/GB/hour):
+Launch a 1GB Basic tier Google Cloud Memorystore for Redis instance ($0.049/GB/hour):
 ```
 gcloud redis instances create crawlredis --size=1 --region=us-central1 --redis-version=redis_4_0
 ```
 
-Next, use the following output:
+Launch a temporary redis-box pod deployed to the cluster which we use to interact with the above Redis instance:
+```
+kubectl apply -f redis-box.yaml
+```
+
+Use the following output:
 ```
 gcloud redis instances describe crawlredis --region=us-central1
 ```
@@ -178,9 +183,8 @@ Note that for the remainder of these instructions, `metadata.name` is assumed to
 
 #### Queue status
 
-Open a temporary instance and launch redis-cli:
+Launch redis-cli:
 ```
-kubectl apply -f redis-box.yaml
 kubectl exec -it redis-box -- sh -c "redis-cli -h $REDIS_HOST"
 ```
 

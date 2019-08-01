@@ -24,7 +24,6 @@ echo "DEL $REDIS_QUEUE_NAME:processing" >> joblist.txt
 # awk #1 = Add the RPUSH command with the site value within single quotes
 cat "$SITE_LIST_CSV" | sed '1!G;h;$!d' | sed "s/'/\\\'/g" | awk -F ',' 'FNR > 0 {print "RPUSH '$REDIS_QUEUE_NAME' '\''"$1","$2"'\''"}' >> joblist.txt
 
-kubectl apply -f redis-box.yaml
 kubectl cp joblist.txt redis-box:/tmp/joblist.txt
 kubectl exec redis-box -- sh -c "cat /tmp/joblist.txt | redis-cli -h $REDIS_HOST --pipe"
 
