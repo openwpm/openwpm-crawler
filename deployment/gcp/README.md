@@ -180,8 +180,8 @@ Note that for the remainder of these instructions, `metadata.name` is assumed to
 
 Open a temporary instance and launch redis-cli:
 ```
-kubectl attach redisbox -c redisbox -i -t || kubectl run --generator=run-pod/v1 -i --tty redisbox --image=gcr.io/google_containers/redis:v1 --env REDIS_HOST=$REDIS_HOST -- bash
-redis-cli -h $REDIS_HOST
+kubectl apply -f redis-box.yaml
+kubectl exec -it redis-box -- sh -c "redis-cli -h $REDIS_HOST"
 ```
 
 Current length of the queue:
@@ -197,11 +197,6 @@ llen crawl-queue:processing
 Contents of the queue:
 ```
 lrange crawl-queue 0 -1
-```
-
-Note: To re-connect to an already running redis box pod:
-```
-kubectl attach redisbox -c redisbox -i -t
 ```
 
 #### Crawl progress and logs
@@ -239,7 +234,7 @@ The crawl data will end up in Parquet format in the S3 bucket that you configure
 ```
 kubectl delete -f crawl.yaml
 gcloud redis instances delete crawlredis --region=us-central1
-kubectl delete pod redisbox
+kubectl delete -f redis-box.yaml
 ```
 
 ### Decrease the size of the cluster while it is not in use

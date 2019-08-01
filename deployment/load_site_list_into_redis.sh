@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+if [[ "$REDIS_HOST" == "" ]]; then
+    echo "The env var $REDIS_HOST needs to be set with the IP/hostname of the managed Redis instance" >&2
+    exit 1
+fi
+
 if [[ $# -lt 2 ]]; then
     echo "Usage: load_site_list_into_redis.sh redis_queue_name site_list_csv" >&2
     exit 1
@@ -19,7 +24,8 @@ echo "DEL $REDIS_QUEUE_NAME:processing" >> joblist.txt
 # awk #1 = Add the RPUSH command with the site value within single quotes
 cat "$SITE_LIST_CSV" | sed '1!G;h;$!d' | sed "s/'/\\\'/g" | awk -F ',' 'FNR > 0 {print "RPUSH '$REDIS_QUEUE_NAME' '\''"$1","$2"'\''"}' >> joblist.txt
 
-kubectl cp joblist.txt redis-master:/tmp/joblist.txt
-kubectl exec redis-master -- sh -c "cat /tmp/joblist.txt | redis-cli --pipe"
+kubectl apply -f redis-box.yaml
+kubectl cp joblist.txt redis-box:/tmp/joblist.txt
+kubectl exec redis-box -- sh -c "cat /tmp/joblist.txt | redis-cli -h $REDIS_HOST --pipe"
 
 rm joblist.txt
