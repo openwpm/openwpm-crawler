@@ -31,7 +31,7 @@ export PROJECT="foo-sandbox"
 
 ### Setup GKE Cluster
 
-The following command will create a zonal GKE cluster with [preemptible](https://cloud.google.com/preemptible-vms/) [n1-highcpu-16](https://cloud.google.com/compute/all-pricing) nodes ($0.1200/node/h).
+The following command will create a zonal GKE cluster with [n1-highcpu-16](https://cloud.google.com/compute/all-pricing) nodes ($0.5672/node/h).
 
 You may want to adjust fields within `./start_gke_cluster.sh` where appropriate such as:
 - num-nodes, min-nodes, max-nodes
@@ -40,6 +40,12 @@ You may want to adjust fields within `./start_gke_cluster.sh` where appropriate 
 
 ```
 ./start_gke_cluster.sh crawl1
+```
+
+Note: For testing, you can use [preemptible](https://cloud.google.com/preemptible-vms/) nodes ($0.1200/node/h) instead:
+
+```
+./start_gke_cluster.sh crawl1 --preemptible
 ```
 
 ### Fetch kubernetes cluster credentials for use with `kubectl`
