@@ -169,6 +169,16 @@ Use of `envsubst` has already replaced `$REDIS_HOST` with the value of the env v
 
 Note: A useful naming convention for `CRAWL_DIRECTORY` is `YYYY-MM-DD_description_of_the_crawl`.
 
+### Scale up the cluster before running the crawl
+
+Some nodes including the master node can become temporarily unavailable  during cluster auto-scaling operations. When larger new crawls are started, this can cause disruptions for a couple of minutes after the crawl has started.
+
+To avoid this, set the amount of nodes (to, say, 15) before starting the crawl:
+
+```
+gcloud container clusters resize crawl1 --num-nodes=15
+```
+
 ## Start the crawl
 
 When you are ready, deploy the crawl:
@@ -243,7 +253,13 @@ kubectl delete -f redis-box.yaml
 
 ### Decrease the size of the cluster while it is not in use
 
-While the cluster has auto-scaling activated, and thus should scale down when not in use, it can sometimes be slow to do this or fail to do this adequately. In these instances, it is a good idea to go to `Clusters -> crawl -> default-pool -> Edit` and set the number of instances to 0 or 1 manually. It will still scale up when the next crawl is executed.
+While the cluster has auto-scaling activated, and thus should scale down when not in use, it can sometimes be slow to do this or fail to do this adequately. In these instances, it is a good idea to set the number of nodes to 0 or 1 manually:
+
+```
+gcloud container clusters resize crawl1 --num-nodes=1
+```
+
+It will still auto-scale up when the next crawl is executed.
 
 ### Deleting the GKE Cluster
 
