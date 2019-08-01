@@ -5,6 +5,7 @@ metadata:
 spec:
   # adjust for parallelism
   parallelism: 100
+  backoffLimit: 10000 # to avoid crawls failing due to sporadic worker crashes
   template:
     metadata:
       name: openwpm-crawl
