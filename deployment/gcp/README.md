@@ -89,7 +89,7 @@ Create a comma-separated site list as per:
 echo "1,http://www.example.com
 2,http://www.example.org
 3,http://www.princeton.edu
-4,http://citp.princeton.edu/" > site_list.csv
+4,http://citp.princeton.edu/?foo='bar" > site_list.csv
 
 ../load_site_list_into_redis.sh crawl-queue site_list.csv 
 ```
