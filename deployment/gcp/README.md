@@ -239,7 +239,7 @@ kubectl delete -f redis-box.yaml
 
 ### Decrease the size of the cluster while it is not in use
 
-While the cluster has autoscaling activated, and thus should scale down when not in use, it can sometimes be slow to do this or fail to do this adequately. In these instances, it is a good idea to go to `Clusters -> crawl1 -> default-pool -> Edit` and set the number of instances to 0 or 1 manually. It will still scale up when the next crawl is executed.
+While the cluster has auto-scaling activated, and thus should scale down when not in use, it can sometimes be slow to do this or fail to do this adequately. In these instances, it is a good idea to go to `Clusters -> crawl -> default-pool -> Edit` and set the number of instances to 0 or 1 manually. It will still scale up when the next crawl is executed.
 
 ### Deleting the GKE Cluster
 
