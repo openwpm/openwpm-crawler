@@ -18,4 +18,5 @@ gcloud container clusters create $CLUSTER_NAME \
 --min-nodes=0 \
 --max-nodes=30 \
 --enable-autoscaling \
+--enable-ip-alias \
 --min-cpu-platform="Intel Broadwell" $ADDITIONAL_ARGS

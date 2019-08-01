@@ -27,6 +27,8 @@ spec:
               key: aws_secret_access_key
         - name: NUM_BROWSERS
           value: '1'
+        - name: REDIS_HOST
+          value: '$REDIS_HOST'
         - name: REDIS_QUEUE_NAME
           value: 'crawl-queue'
         - name: CRAWL_DIRECTORY
