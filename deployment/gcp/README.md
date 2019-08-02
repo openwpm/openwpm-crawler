@@ -19,7 +19,7 @@ For the remainder of these instructions, you are assumed to be in the `deploymen
 export PROJECT="foo-sandbox"
 ```
 
-## Provision GCP Resources
+## (One time) Provision GCP Resources
 
 ### Configure the GCP Project
 
@@ -31,7 +31,7 @@ export PROJECT="foo-sandbox"
 
 ### Setup GKE Cluster
 
-The following command will create a zonal GKE cluster with [preemptible](https://cloud.google.com/preemptible-vms/) [n1-highcpu-16](https://cloud.google.com/compute/all-pricing) nodes ($0.1200/node/h).
+The following command will create a zonal GKE cluster with [n1-highcpu-16](https://cloud.google.com/compute/all-pricing) nodes ($0.5672/node/h) with [IP-Alias enabled](https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips#creating_a_new_cluster_with_ip_aliases) (makes it a bit easier to connect to managed Redis instances from the cluster).
 
 You may want to adjust fields within `./start_gke_cluster.sh` where appropriate such as:
 - num-nodes, min-nodes, max-nodes
@@ -42,6 +42,12 @@ You may want to adjust fields within `./start_gke_cluster.sh` where appropriate 
 ./start_gke_cluster.sh crawl1
 ```
 
+Note: For testing, you can use [preemptible](https://cloud.google.com/preemptible-vms/) nodes ($0.1200/node/h) instead:
+
+```
+./start_gke_cluster.sh crawl1 --preemptible
+```
+
 ### Fetch kubernetes cluster credentials for use with `kubectl`
 
 ```
@@ -50,17 +56,24 @@ gcloud container clusters get-credentials crawl1
 
 This allows subsequent `kubectl` commands to interact with our cluster (using the context `gke_{PROJECT}_{ZONE}_{CLUSTER_NAME}`)
 
-## Build and push Docker image to GCR
+## (Optional) Configure sentry credentials
 
-(Optional) If one of [the pre-built OpenWPM Docker images](https://hub.docker.com/r/openwpm/openwpm/tags) are not sufficient:
+Set the Sentry DSN as a kubectl secret (change `foo` below):
 ```
-cd ../openwpm-crawler/OpenWPM; docker build -t gcr.io/$PROJECT/openwpm .; cd -
-gcloud auth configure-docker
-docker push gcr.io/$PROJECT/openwpm
+kubectl create secret generic sentry-config \
+--from-literal=sentry_dsn=foo
 ```
-Remember to change the `crawl.yaml` to point to `image: gcr.io/$PROJECT/openwpm`.
 
-## Allow the cluster to access AWS S3
+To run crawls without Sentry, remove the following from the crawl config after it has been generated below:
+```
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: sentry-config
+              key: sentry_dsn
+```
+
+## (One time)  Allow the cluster to access AWS S3
 
 Make sure that your AWS credentials are stored in `~/.aws/credentials` as per:
 
@@ -75,11 +88,39 @@ Then run:
 ./aws_credentials_as_kubectl_secrets.sh
 ```
 
+## Build and push Docker image to GCR
+
+(Optional) If one of [the pre-built OpenWPM Docker images](https://hub.docker.com/r/openwpm/openwpm/tags) are not sufficient:
+```
+cd ../openwpm-crawler/OpenWPM; docker build -t gcr.io/$PROJECT/openwpm .; cd -
+gcloud auth configure-docker
+docker push gcr.io/$PROJECT/openwpm
+```
+Remember to change the `crawl.yaml` to point to `image: gcr.io/$PROJECT/openwpm`.
+
 ## Deploy the redis server which we use for the work queue
 
+Launch a 1GB Basic tier Google Cloud Memorystore for Redis instance ($0.049/GB/hour):
 ```
-kubectl apply -f redis.yaml
+gcloud redis instances create crawlredis --size=1 --region=us-central1 --redis-version=redis_4_0
 ```
+
+Launch a temporary redis-box pod deployed to the cluster which we use to interact with the above Redis instance:
+```
+kubectl apply -f redis-box.yaml
+```
+
+Use the following output:
+```
+gcloud redis instances describe crawlredis --region=us-central1
+```
+... to set the corresponding env var:
+
+```
+export REDIS_HOST=10.0.0.3
+```
+
+(See https://cloud.google.com/memorystore/docs/redis/connecting-redis-instance for more information.)
 
 ## Adding sites to be crawled to the queue
 
@@ -117,32 +158,25 @@ cd ../../; python -m utilities.get_sampled_sites; cd -
 
 Since each crawl is unique, you need to configure your `crawl.yaml` deployment configuration. We have provided a template to start from:
 ```
-cp crawl.tmpl.yaml crawl.yaml
+envsubst < ./crawl.tmpl.yaml > crawl.yaml
 ```
 
-- Update `crawl.yaml`. This may include:
-    - spec.parallelism
-    - spec.containers.image
-    - spec.containers.env
-    - spec.containers.resources
+Use of `envsubst` has already replaced `$REDIS_HOST` with the value of the env var set previously, but you may still want to adapt `crawl.yaml`:
+- spec.parallelism
+- spec.containers.image
+- spec.containers.env
+- spec.containers.resources
 
 Note: A useful naming convention for `CRAWL_DIRECTORY` is `YYYY-MM-DD_description_of_the_crawl`.
 
-## (Optional) Configure sentry credentials
+### Scale up the cluster before running the crawl
 
-Set the Sentry DSN as a kubectl secret (change `foo` below):
-```
-kubectl create secret generic sentry-config \
---from-literal=sentry_dsn=foo
-```
+Some nodes including the master node can become temporarily unavailable  during cluster auto-scaling operations. When larger new crawls are started, this can cause disruptions for a couple of minutes after the crawl has started.
 
-To run crawls without Sentry, remove the following from the crawl config:
+To avoid this, set the amount of nodes (to, say, 15) before starting the crawl:
+
 ```
-        - name: SENTRY_DSN
-          valueFrom:
-            secretKeyRef:
-              name: sentry-config
-              key: sentry_dsn
+gcloud container clusters resize crawl1 --num-nodes=15
 ```
 
 ## Start the crawl
@@ -159,10 +193,9 @@ Note that for the remainder of these instructions, `metadata.name` is assumed to
 
 #### Queue status
 
-Open a temporary instance and launch redis-cli:
+Launch redis-cli:
 ```
-kubectl attach temp -c temp -i -t || kubectl run --generator=run-pod/v1 -i --tty temp --image redis --command "/bin/bash"
-redis-cli -h redis
+kubectl exec -it redis-box -- sh -c "redis-cli -h $REDIS_HOST"
 ```
 
 Current length of the queue:
@@ -180,7 +213,7 @@ Contents of the queue:
 lrange crawl-queue 0 -1
 ```
 
-#### OpenWPM progress and logs
+#### Crawl progress and logs
 
 Check out the [GCP GKE Console](https://console.cloud.google.com/kubernetes/workload)
 
@@ -210,17 +243,23 @@ kubectl describe job openwpm-crawl
 
 The crawl data will end up in Parquet format in the S3 bucket that you configured.
 
-### Clean up created pods, services and local artifacts
+### Clean up created pods, instances and local artifacts
 
 ```
-kubectl delete -f redis.yaml
 kubectl delete -f crawl.yaml
-kubectl delete pod temp
+gcloud redis instances delete crawlredis --region=us-central1
+kubectl delete -f redis-box.yaml
 ```
 
 ### Decrease the size of the cluster while it is not in use
 
-While the cluster has autoscaling activated, and thus should scale down when not in use, it can sometimes be slow to do this or fail to do this adequately. In these instances, it is a good idea to go to `Clusters -> crawl1 -> default-pool -> Edit` and set the number of instances to 0 or 1 manually. It will still scale up when the next crawl is executed.
+While the cluster has auto-scaling activated, and thus should scale down when not in use, it can sometimes be slow to do this or fail to do this adequately. In these instances, it is a good idea to set the number of nodes to 0 or 1 manually:
+
+```
+gcloud container clusters resize crawl1 --num-nodes=1
+```
+
+It will still auto-scale up when the next crawl is executed.
 
 ### Deleting the GKE Cluster
 

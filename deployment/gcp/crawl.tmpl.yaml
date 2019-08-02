@@ -5,6 +5,7 @@ metadata:
 spec:
   # adjust for parallelism
   parallelism: 100
+  backoffLimit: 10000 # to avoid crawls failing due to sporadic worker crashes
   template:
     metadata:
       name: openwpm-crawl
@@ -27,6 +28,8 @@ spec:
               key: aws_secret_access_key
         - name: NUM_BROWSERS
           value: '1'
+        - name: REDIS_HOST
+          value: '$REDIS_HOST'
         - name: REDIS_QUEUE_NAME
           value: 'crawl-queue'
         - name: CRAWL_DIRECTORY
@@ -56,6 +59,8 @@ spec:
           # these are taken at face value by the autoscaler, so they should match actual
           # resources required by any single instance/container as good as possible
           # see: https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler
+          # tip: observe `kubectl top nodes` during auto-scaled crawls to get an idea of how
+          # resources are being utilized
           requests:
             cpu: 750m
           limits:

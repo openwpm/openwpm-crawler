@@ -2,10 +2,11 @@
 set -e
 
 if [[ $# -lt 1 ]]; then
-    echo "Usage: start_gke_cluster.sh cluster_name" >&2
+    echo "Usage: start_gke_cluster.sh cluster_name additional_args" >&2
     exit 1
 fi
 CLUSTER_NAME=$1
+ADDITIONAL_ARGS="${*:2}"
 
 gcloud container clusters create $CLUSTER_NAME \
 --zone us-central1-f \
@@ -17,5 +18,5 @@ gcloud container clusters create $CLUSTER_NAME \
 --min-nodes=0 \
 --max-nodes=30 \
 --enable-autoscaling \
---min-cpu-platform="Intel Broadwell" \
---preemptible
+--enable-ip-alias \
+--min-cpu-platform="Intel Broadwell" $ADDITIONAL_ARGS

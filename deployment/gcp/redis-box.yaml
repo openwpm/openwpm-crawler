@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-box
+  labels:
+    app: redis-box
+spec:
+  containers:
+    - name: redis-box
+      image: redis:4
+      # avoids starting the redis-server
+      command: ["tail"]
+      args: ["-f", "/dev/null"]
