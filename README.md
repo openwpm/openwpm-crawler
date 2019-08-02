@@ -31,11 +31,3 @@ jupyter notebook
 ```
 
 After launching Jupyter, navigate to `analysis/Sample Analysis.ipynb` and choose `Kernel -> Change Kernel -> openwpm-crawler` in the menu.
-
-## Developer notes
-
-To update the OpenWPM submodule to the latest commit in the remotely tracked branch:
-
-```
-git submodule update --remote OpenWPM
-```

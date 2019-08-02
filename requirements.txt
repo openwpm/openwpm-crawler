@@ -5,3 +5,4 @@ s3cmd
 # for analysis
 ipykernel
 openwpm-utils
+flake8-isort

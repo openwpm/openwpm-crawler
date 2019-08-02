@@ -9,11 +9,6 @@ pip install --upgrade pip
 # Install requirements
 pip install -U -r requirements.txt
 
-# Install all analysis requirements except plyvel
-cat analysis/utils/requirements.txt | grep -v plyvel > analysis/utils/requirements.mac.txt
-CFLAGS='-mmacosx-version-min=10.7 -stdlib=libc++' pip install -r analysis/utils/requirements.mac.txt
-rm analysis/utils/requirements.mac.txt
-
 # A recent version of leveldb is required
 brew install leveldb || brew upgrade leveldb
 
