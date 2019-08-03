@@ -1,3 +1,6 @@
+# Notebook checkpoints
+.ipynb_checkpoints/
+
 # Docker volume
 docker-volume/
 
