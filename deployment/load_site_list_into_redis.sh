@@ -19,10 +19,11 @@ echo -e "\nEnqueuing site list in redis"
 echo "DEL $REDIS_QUEUE_NAME" > joblist.txt
 echo "DEL $REDIS_QUEUE_NAME:processing" >> joblist.txt
 
+# tr #1 = Remove dos-style line endings which appears in some lists
 # sed #1 = Add site list in reverse order since the queue gets worked upon from the bottom up
 # sed #2 = Quote single quotes
 # awk #1 = Add the RPUSH command with the site value within single quotes
-cat "$SITE_LIST_CSV" | sed '1!G;h;$!d' | sed "s/'/\\\'/g" | awk -F ',' 'FNR > 0 {print "RPUSH '$REDIS_QUEUE_NAME' '\''"$1","$2"'\''"}' >> joblist.txt
+cat "$SITE_LIST_CSV" | tr -d '\r' | sed '1!G;h;$!d' | sed "s/'/\\\'/g" | awk -F ',' 'FNR > 0 {print "RPUSH '$REDIS_QUEUE_NAME' '\''"$1","$2"'\''"}' >> joblist.txt
 
 kubectl cp joblist.txt redis-box:/tmp/joblist.txt
 kubectl exec redis-box -- sh -c "cat /tmp/joblist.txt | redis-cli -h $REDIS_HOST --pipe"
