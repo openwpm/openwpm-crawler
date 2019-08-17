@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: redis-master
+  name: redis-box
   labels:
-    app: redis
+    app: redis-box
 spec:
   containers:
-    - name: master
+    - name: redis-box
       image: redis
       env:
         - name: MASTER
