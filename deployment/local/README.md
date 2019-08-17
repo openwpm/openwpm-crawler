@@ -162,6 +162,13 @@ watch kubectl get pods --selector=job-name=local-crawl
 kubectl describe job local-crawl
 ```
 
+(Optional) If you're using the Minikube cluster, you can view the cluster and
+job status by running:
+
+```
+minikube dashboard
+```
+
 #### View Job logs
 
 ```

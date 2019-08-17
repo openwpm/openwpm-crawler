@@ -6,7 +6,7 @@ metadata:
     app: redis-box
 spec:
   containers:
-    - name: redis-box
+    - name: redis
       image: redis
       env:
         - name: MASTER
@@ -17,10 +17,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis
+  name: redis-box
 spec:
   selector:
-    app: redis
+    app: redis-box
   ports:
     - port: 6379
       targetPort: 6379
