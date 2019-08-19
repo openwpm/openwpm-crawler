@@ -19,6 +19,7 @@ echo -e "\nEnqueuing site list in redis"
 # Make sure to clear the queue before adding our site list
 echo "DEL $REDIS_QUEUE_NAME" > joblist.txt
 echo "DEL $REDIS_QUEUE_NAME:processing" >> joblist.txt
+echo "DEL $REDIS_QUEUE_NAME:retries" >> joblist.txt
 
 # tr #1 = Remove dos-style line endings which appears in some lists
 # sed #1 = Add site list in reverse order since the queue gets worked upon from the bottom up
