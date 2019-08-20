@@ -2,8 +2,9 @@
 set -e
 
 if [[ "$REDIS_HOST" == "" ]]; then
-    echo "The env var $REDIS_HOST needs to be set with the IP/hostname of the managed Redis instance" >&2
-    exit 1
+    echo "The env var REDIS_HOST needs to be set with the IP/hostname of the managed Redis instance" >&2
+    echo "Assuming we are testing locally and setting REDIS_HOST to localhost." >&2
+    REDIS_HOST="localhost"
 fi
 
 if [[ $# -lt 2 ]]; then

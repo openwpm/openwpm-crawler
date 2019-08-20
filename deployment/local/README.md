@@ -21,7 +21,8 @@ KubeDNS is running at https://...
 ```
 
 If a cluster isn't running and you're using Minikube as your local cluster,
-you can start it by running `minikube start`.
+you can start it by running `minikube start --cpus 4 --memory 4096` (you can
+change the number of CPUs and memory as necessary).
 
 ## Build Docker image
 
@@ -36,6 +37,16 @@ Alternatively, you can build the image from a local OpenWPM code repository:
 
 ```
 cd path/to/OpenWPM
+docker build -t openwpm .
+cd -
+```
+
+If you're using Minikube as your local cluster, you'll need to set the Docker
+environment prior to building the local container to avoid `ErrImageNeverPull`:
+
+```
+cd path/to/OpenWPM
+eval $(minikube docker-env)
 docker build -t openwpm .
 cd -
 ```
@@ -68,7 +79,14 @@ echo "1,http://www.example.com
 (Optional) To load Alexa Top 1M into redis:
 
 ```
-../load_alexa_top_1m_site_list_into_redis.sh crawl-queue site_list.csv 
+cd ..; ./load_alexa_top_1m_site_list_into_redis.sh crawl-queue; cd -
+```
+
+You can also specify a max rank to load into the queue. For example, to add the
+top 1000 sites from the Alexa Top 1M list:
+
+```
+cd ..; ./load_alexa_top_1m_site_list_into_redis.sh crawl-queue 1000; cd -
 ```
 
 (Optional) Use some of the `../../utilities/crawl_utils.py` code. For instance, to fetch and store a sample of Alexa Top 1M to `/tmp/sampled_sites.json`:
@@ -103,8 +121,7 @@ Note that for the remainder of these instructions, `metadata.name` is assumed to
 
 Open a temporary instance and launch redis-cli:
 ```
-kubectl attach temp -c temp -i -t || kubectl run --generator=run-pod/v1 -i --tty temp --image redis --command "/bin/bash"
-redis-cli -h redis
+kubectl exec -it redis-box -- sh -c "redis-cli -h localhost"
 ```
 
 Current length of the queue:
@@ -143,6 +160,13 @@ watch kubectl get pods --selector=job-name=local-crawl
 
 ```
 kubectl describe job local-crawl
+```
+
+(Optional) If you're using the Minikube cluster, you can view the cluster and
+job status by running:
+
+```
+minikube dashboard
 ```
 
 #### View Job logs
