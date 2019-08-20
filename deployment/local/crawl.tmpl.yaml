@@ -48,4 +48,6 @@ spec:
           value: 'DEBUG'
         - name: LOG_LEVEL_FILE
           value: 'DEBUG'
+        - name: MAX_JOB_RETRIES
+          value: '3'
       restartPolicy: OnFailure

@@ -63,6 +63,8 @@ spec:
           value: 'DEBUG'
         - name: LOG_LEVEL_SENTRY_EVENT
           value: 'ERROR'
+        - name: MAX_JOB_RETRIES
+          value: '3'
         resources:
           # these are taken at face value by the autoscaler, so they should match actual
           # resources required by any single instance/container as good as possible
