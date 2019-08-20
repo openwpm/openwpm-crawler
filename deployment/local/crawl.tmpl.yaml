@@ -44,4 +44,8 @@ spec:
           value: '10'
         - name: TIMEOUT
           value: '60'
+        - name: LOG_LEVEL_CONSOLE
+          value: 'DEBUG'
+        - name: LOG_LEVEL_FILE
+          value: 'DEBUG'
       restartPolicy: OnFailure
