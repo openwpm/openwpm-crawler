@@ -20,8 +20,6 @@ spec:
           value: 'foo'
         - name: AWS_SECRET_ACCESS_KEY
           value: 'foo'
-        - name: NUM_BROWSERS
-          value: '1'
         - name: REDIS_QUEUE_NAME
           value: 'crawl-queue'
         - name: CRAWL_DIRECTORY
@@ -49,5 +47,5 @@ spec:
         - name: LOG_LEVEL_FILE
           value: 'DEBUG'
         - name: MAX_JOB_RETRIES
-          value: '3'
+          value: '2'
       restartPolicy: OnFailure

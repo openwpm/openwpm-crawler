@@ -26,8 +26,6 @@ spec:
             secretKeyRef:
               name: aws-config
               key: aws_secret_access_key
-        - name: NUM_BROWSERS
-          value: '1'
         - name: REDIS_HOST
           value: '$REDIS_HOST'
         - name: REDIS_QUEUE_NAME
@@ -64,7 +62,7 @@ spec:
         - name: LOG_LEVEL_SENTRY_EVENT
           value: 'ERROR'
         - name: MAX_JOB_RETRIES
-          value: '3'
+          value: '2'
         resources:
           # these are taken at face value by the autoscaler, so they should match actual
           # resources required by any single instance/container as good as possible
