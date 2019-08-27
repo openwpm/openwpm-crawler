@@ -4,7 +4,7 @@ metadata:
   name: openwpm-crawl
 spec:
   # adjust for parallelism
-  parallelism: 100
+  parallelism: 300
   backoffLimit: 10000 # to avoid crawls failing due to sporadic worker crashes
   template:
     metadata:
@@ -78,6 +78,7 @@ spec:
           # resources are being utilized
           requests:
             cpu: 750m
+            memory: 1000Mi
           limits:
             cpu: 1
       restartPolicy: OnFailure
