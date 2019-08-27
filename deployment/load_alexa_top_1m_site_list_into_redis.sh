@@ -8,6 +8,10 @@ fi
 REDIS_QUEUE_NAME="$1"
 MAX_RANK="$2"
 
+echo -e "\nAttempting to clean up any leftover lists from a previous run..."
+rm top-1m.csv.zip* || true
+rm top-1m.csv* || true
+
 echo -e "\nDownloading and unzipping site list..."
 wget http://s3.amazonaws.com/alexa-static/top-1m.csv.zip
 unzip -o top-1m.csv.zip
