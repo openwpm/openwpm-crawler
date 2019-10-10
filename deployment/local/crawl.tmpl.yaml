@@ -16,7 +16,7 @@ spec:
       containers:
       - name: openwpm-crawl
         image: openwpm
-        command: ["python"]
+        command: ["python3"]
         args: ["crawler.py"]
         imagePullPolicy: Never # allows use of a locally built/tagged docker image
         volumeMounts:
@@ -43,8 +43,8 @@ spec:
           value: '1'
         - name: JS_INSTRUMENT
           value: '1'
-        - name: SAVE_JAVASCRIPT
-          value: '1'
+        - name: SAVE_CONTENT
+          value: 'script'
         - name: DWELL_TIME
           value: '10'
         - name: TIMEOUT
