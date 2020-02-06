@@ -192,9 +192,9 @@ kubectl create -f crawl.yaml
 
 Note that for the remainder of these instructions, `metadata.name` is assumed to be set to `openwpm-crawl`.
 
-### Monitor the crawl
+## Monitor the crawl
 
-#### Queue status
+### Queue status
 
 Launch redis-cli:
 ```
@@ -216,7 +216,7 @@ Contents of the queue:
 lrange crawl-queue 0 -1
 ```
 
-#### Crawl progress and logs
+### Crawl progress and logs
 
 Check out the [GCP GKE Console](https://console.cloud.google.com/kubernetes/workload)
 
@@ -233,18 +233,39 @@ watch kubectl get pods --selector=job-name=openwpm-crawl
 kubectl describe job openwpm-crawl
 ```
 
-#### View Job logs via GCP Stackdriver Logging Interface
+### View Job logs via GCP Stackdriver Logging Interface
 
 - Visit [GCP Logging Console](https://console.cloud.google.com/logs/viewer)
 - Select `GKE Container`
 
-#### Using the Kubernetes Dashboard UI
+### Using the Kubernetes Dashboard UI
 
 (Optional) You can also spin up the Kubernetes Dashboard UI as per [these instructions](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/#deploying-the-dashboard-ui) which will allow for easy access to status and logs related to running jobs/crawls.
 
 ### Inspecting crawl results
 
 The crawl data will end up in Parquet format in the S3 bucket that you configured.
+
+## Deleting resources after the crawl
+
+### Discover running instances
+
+If you can't remember which `$CRAWL_PREFIX` you specified to start the crawl,
+you can check the currently running clusters using:
+
+```
+gcloud container clusters list
+```
+
+You can check the currently running redis instances using:
+
+```
+gcloud redis instances list --region=us-central1
+```
+
+Be sure that you don't kill clusters or redis instances used by other users of
+your GCP project (if any).
+
 
 ### Clean up created pods, instances and local artifacts
 
