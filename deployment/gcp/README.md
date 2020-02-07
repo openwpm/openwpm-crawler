@@ -13,10 +13,11 @@ Documentation and scripts to launch an OpenWPM crawl on a Kubernetes cluster on 
 - Visit [GCP Kubernetes Engine API](https://console.cloud.google.com/apis/api/container.googleapis.com/overview) to enable the API.
     - You may need to set the Billing account.
 
-For the remainder of these instructions, you are assumed to be in the `deployment/gcp/` folder, and you should have the following env var set to the project you have set up:
+For the remainder of these instructions, you are assumed to be in the `deployment/gcp/` folder, and you should have the following env vars set to the GCP project you're using as well as a prefix to identify your resources within that project (e.g., your username):
 
 ```
 export PROJECT="foo-sandbox"
+export CRAWL_PREFIX="foo"
 ```
 
 ## (One time) Provision GCP Resources
@@ -39,19 +40,19 @@ You may want to adjust fields within `./start_gke_cluster.sh` where appropriate 
 - See the [GKE Quickstart](https://cloud.google.com/kubernetes-engine/docs/quickstart) guide and [cluster create](https://cloud.google.com/sdk/gcloud/reference/container/clusters/create) documentation.
 
 ```
-./start_gke_cluster.sh crawl1
+./start_gke_cluster.sh $CRAWL_PREFIX-cluster
 ```
 
 Note: For testing, you can use [preemptible](https://cloud.google.com/preemptible-vms/) nodes ($0.1200/node/h) instead:
 
 ```
-./start_gke_cluster.sh crawl1 --preemptible
+./start_gke_cluster.sh $CRAWL_PREFIX-cluster --preemptible
 ```
 
 ### Fetch kubernetes cluster credentials for use with `kubectl`
 
 ```
-gcloud container clusters get-credentials crawl1
+gcloud container clusters get-credentials $CRAWL_PREFIX-cluster
 ```
 
 This allows subsequent `kubectl` commands to interact with our cluster (using the context `gke_{PROJECT}_{ZONE}_{CLUSTER_NAME}`)
@@ -104,7 +105,7 @@ Remember to change the `crawl.yaml` to point to `image: gcr.io/$PROJECT/openwpm`
 
 Launch a 1GB Basic tier Google Cloud Memorystore for Redis instance ($0.049/GB/hour):
 ```
-gcloud redis instances create crawlredis --size=1 --region=us-central1 --redis-version=redis_4_0
+gcloud redis instances create $CRAWL_PREFIX-redis --size=1 --region=us-central1 --redis-version=redis_4_0
 ```
 
 Launch a temporary redis-box pod deployed to the cluster which we use to interact with the above Redis instance:
@@ -114,7 +115,7 @@ kubectl apply -f redis-box.yaml
 
 Use the following output:
 ```
-gcloud redis instances describe crawlredis --region=us-central1
+gcloud redis instances describe $CRAWL_PREFIX-redis --region=us-central1
 ```
 ... to set the corresponding env var:
 
@@ -178,7 +179,7 @@ Some nodes including the master node can become temporarily unavailable  during 
 To avoid this, set the amount of nodes (to, say, 15) before starting the crawl:
 
 ```
-gcloud container clusters resize crawl1 --num-nodes=15
+gcloud container clusters resize $CRAWL_PREFIX-cluster --num-nodes=15
 ```
 
 ## Start the crawl
@@ -191,9 +192,9 @@ kubectl create -f crawl.yaml
 
 Note that for the remainder of these instructions, `metadata.name` is assumed to be set to `openwpm-crawl`.
 
-### Monitor the crawl
+## Monitor the crawl
 
-#### Queue status
+### Queue status
 
 Launch redis-cli:
 ```
@@ -215,7 +216,7 @@ Contents of the queue:
 lrange crawl-queue 0 -1
 ```
 
-#### Crawl progress and logs
+### Crawl progress and logs
 
 Check out the [GCP GKE Console](https://console.cloud.google.com/kubernetes/workload)
 
@@ -232,12 +233,12 @@ watch kubectl get pods --selector=job-name=openwpm-crawl
 kubectl describe job openwpm-crawl
 ```
 
-#### View Job logs via GCP Stackdriver Logging Interface
+### View Job logs via GCP Stackdriver Logging Interface
 
 - Visit [GCP Logging Console](https://console.cloud.google.com/logs/viewer)
 - Select `GKE Container`
 
-#### Using the Kubernetes Dashboard UI
+### Using the Kubernetes Dashboard UI
 
 (Optional) You can also spin up the Kubernetes Dashboard UI as per [these instructions](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/#deploying-the-dashboard-ui) which will allow for easy access to status and logs related to running jobs/crawls.
 
@@ -245,11 +246,32 @@ kubectl describe job openwpm-crawl
 
 The crawl data will end up in Parquet format in the S3 bucket that you configured.
 
+## Deleting resources after the crawl
+
+### Discover running instances
+
+If you can't remember which `$CRAWL_PREFIX` you specified to start the crawl,
+you can check the currently running clusters using:
+
+```
+gcloud container clusters list
+```
+
+You can check the currently running redis instances using:
+
+```
+gcloud redis instances list --region=us-central1
+```
+
+Be sure that you don't kill clusters or redis instances used by other users of
+your GCP project (if any).
+
+
 ### Clean up created pods, instances and local artifacts
 
 ```
 kubectl delete -f crawl.yaml
-gcloud redis instances delete crawlredis --region=us-central1
+gcloud redis instances delete $CRAWL_PREFIX-redis --region=us-central1
 kubectl delete -f redis-box.yaml
 ```
 
@@ -258,7 +280,7 @@ kubectl delete -f redis-box.yaml
 While the cluster has auto-scaling activated, and thus should scale down when not in use, it can sometimes be slow to do this or fail to do this adequately. In these instances, it is a good idea to set the number of nodes to 0 or 1 manually:
 
 ```
-gcloud container clusters resize crawl1 --num-nodes=1
+gcloud container clusters resize $CRAWL_PREFIX-cluster --num-nodes=1
 ```
 
 It will still auto-scale up when the next crawl is executed.
@@ -267,7 +289,7 @@ It will still auto-scale up when the next crawl is executed.
 
 If crawls are not to be run and the cluster need not to be accessed within the next hours or days, it is safest to delete the cluster:
 ```
-gcloud container clusters delete crawl1
+gcloud container clusters delete $CRAWL_PREFIX-cluster
 ```
 
 ### Troubleshooting
