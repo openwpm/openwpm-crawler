@@ -9,7 +9,7 @@ services:
             - CRAWL_DIRECTORY=local-crawl
             - DISPLAY=${DISPLAY}
         volumes:
-            - crawl_data:/home/root/Desktop/local-crawl/
+            - crawl_data:/root/Desktop/local-crawl/
             - /tmp/.X11-unix:/tmp/.X11-unix
         shm_size: 2G
         depends_on:
