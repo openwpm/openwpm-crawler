@@ -40,9 +40,9 @@ docker-compose up -d redis
 
 ## Adding sites to be crawled to the queue
 
-First set the REDIS_HOST enviroment variable:
+First set the REDIS_CONTAINER enviroment variable:
 ```
-export REDIS_HOST=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker-compose ps -q redis))
+export REDIS_CONTAINER=$(docker-compose ps -q redis)
 ```
 Create a comma-separated site list as per:
 
@@ -54,6 +54,17 @@ echo "1,http://www.example.com
 
 ../load_site_list_into_redis.sh crawl-queue site_list.csv 
 ```
+This command will fail but leave you with a `joblist.txt` in your working directory.
+Now copy the jobs into the redis container and load them into the redis queue.
+
+```
+docker cp joblist.txt $REDIS_CONTAINER:/tmp/joblist.txt 
+docker exec $REDIS_CONTAINER sh -c "cat /tmp/joblist.txt | redis-cli --pipe"  
+```
+
+> All of the following commands will also fail leaving you to do the copying and
+loading by yourself. The joblist file will be created in a one directory up,
+so adjust the `docker cp` accordingly.
 
 (Optional) To load Alexa Top 1M into redis:
 
@@ -78,9 +89,9 @@ cd ../../; python -m utilities.get_sampled_sites; cd -
 
 #### Queue status
 
-Open a temporary instance and launch redis-cli:
+Get a redis-cli on the redis container:
 ```
-docker exec -it $(docker-compose ps -q redis) sh -c "redis-cli -h localhost"
+docker exec -it $(docker-compose ps -q redis) sh -c "redis-cli "
 ```
 
 Current length of the queue:
@@ -102,14 +113,14 @@ lrange crawl-queue:processing 0 -1
 #### Job status
 
 ```
-    docker-compose ps
+docker-compose ps
 ```
 
 #### View Job logs
 
 To watch all output from all running containers continuously 
 ```
-    docker-compose logs -f
+docker-compose logs -f
 ```
 
 ### Inspecting crawl results
@@ -123,8 +134,7 @@ s3cmd --verbose --access_key=foo --secret_key=foo --host=http://$LOCALSTACK_IP:3
 
 The crawl data will end up in Parquet format in `./local-crawl-results/data`
 
-### Clean up created pods, services and local artifacts
-
+### Clean up all created containers
 ```
 docker-compose down
 ```
