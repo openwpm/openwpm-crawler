@@ -13,6 +13,7 @@ Documentation and scripts to launch an OpenWPM crawl using Docker Compose locall
     - [Queue status](#queue-status)
     - [Job status](#job-status)
     - [View Job logs](#view-job-logs)
+    - [Running multiple crawlers](#running-multiple-crawlers)
   - [Inspecting crawl results](#inspecting-crawl-results)
   - [Clean up all created containers](#clean-up-all-created-containers)
 ## Prerequisites
@@ -74,11 +75,6 @@ Now copy the jobs into the redis container and load them into the redis queue.
 docker cp joblist.txt $REDIS_CONTAINER:/tmp/joblist.txt 
 docker exec $REDIS_CONTAINER sh -c "cat /tmp/joblist.txt | redis-cli --pipe"  
 ```
-
-> All of the following commands will also fail leaving you to do the copying and
-loading by yourself. The joblist file will be created in a one directory up,
-so adjust the `docker cp` accordingly.
-
 (Optional) To load Alexa Top 1M into redis:
 
 ```
@@ -142,6 +138,12 @@ To watch all output from all running containers continuously
 docker-compose logs -f
 ```
 
+### Running multiple crawlers
+
+By default the `docker-compose.yml` only creates one crawler.  
+ You can however always upscale that service
+by running `docker-compose up -d --scale crawler={NUMBER_OF_CONTAINERS}`
+
 ## Inspecting crawl results
 
 When it has completed, run:
@@ -151,7 +153,7 @@ export LOCALSTACK_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.
 s3cmd --verbose --access_key=foo --secret_key=foo --host=http://$LOCALSTACK_IP:4572 --host-bucket=localhost --no-ssl sync s3://openwpm-crawls/local-crawl/ crawl-data/
 ```
 
-The crawl data will end up in Parquet format in `./local-crawl-results/data`
+The crawl data will end up in Parquet format in `./crawl-data/data`
 
 ## Clean up all created containers
 ```
