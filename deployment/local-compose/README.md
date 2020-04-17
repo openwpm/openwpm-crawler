@@ -76,13 +76,7 @@ echo "1,http://www.example.com
 
 ../load_site_list_into_redis.sh crawl-queue site_list.csv 
 ```
-This command will fail but leave you with a `joblist.txt` in your working directory.
-Now copy the jobs into the redis container and load them into the redis queue.
 
-```
-docker cp joblist.txt $REDIS_CONTAINER:/tmp/joblist.txt 
-docker exec $REDIS_CONTAINER sh -c "cat /tmp/joblist.txt | redis-cli --pipe"  
-```
 (Optional) To load Alexa Top 1M into redis:
 
 ```
