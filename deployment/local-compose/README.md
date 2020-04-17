@@ -1,13 +1,14 @@
 # Run a local OpenWPM crawl using Docker Compose
 
 [`docker-compose`](https://docs.docker.com/compose/) is a tool that allows for simple local
-container orchestration. It is preshipped with most Docker distributions and as such 
-provide little challenge in setting it up.
+container orchestration. It is preshipped with most Docker distributions and otherwise should
+be very easy to set up.
 
-In it's behaviour it's mostly similiar to the way a user could themselves start containers
-only using the docker CLI tool. As such it might be a better starting point for getting
-started with OpenWPM distributed crawls.
+It behaves similiar to a user starting containers manually only using the Docker CLI and
+as such it might be a good starting point for getting started with OpenWPM distributed crawls.
 
+The given `docker-compose.yml` will create a container for each essential part
+of a distributed crawl. One `localstack` instance, one `reddis` instance and one OpenWPM `crawler`.
 
 - [Run a local OpenWPM crawl using Docker Compose](#run-a-local-openwpm-crawl-using-docker-compose)
   - [Prerequisites](#prerequisites)
@@ -148,7 +149,7 @@ docker-compose logs -f
 ### Running multiple crawlers
 
 By default the `docker-compose.yml` only creates one crawler.  
- You can however always upscale that service
+You can however always upscale that service
 by running `docker-compose up -d --scale crawler={NUMBER_OF_CONTAINERS}`
 
 ## Inspecting crawl results
