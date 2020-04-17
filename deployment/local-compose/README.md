@@ -1,6 +1,13 @@
 # Run a local OpenWPM crawl using Docker Compose
 
-Documentation and scripts to launch an OpenWPM crawl using Docker Compose locally.
+[`docker-compose`](https://docs.docker.com/compose/) is a tool that allows for simple local
+container orchestration. It is preshipped with most Docker distributions and as such 
+provide little challenge in setting it up.
+
+In it's behaviour it's mostly similiar to the way a user could themselves start containers
+only using the docker CLI tool. As such it might be a better starting point for getting
+started with OpenWPM distributed crawls.
+
 
 - [Run a local OpenWPM crawl using Docker Compose](#run-a-local-openwpm-crawl-using-docker-compose)
   - [Prerequisites](#prerequisites)
