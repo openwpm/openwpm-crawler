@@ -35,7 +35,7 @@ export CRAWL_PREFIX="foo"
 The following command will create a zonal GKE cluster with [n1-highcpu-16](https://cloud.google.com/compute/all-pricing) nodes ($0.5672/node/h) with [IP-Alias enabled](https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips#creating_a_new_cluster_with_ip_aliases) (makes it a bit easier to connect to managed Redis instances from the cluster).
 
 You may want to adjust fields within `./start_gke_cluster.sh` where appropriate such as:
-- num-nodes, min-nodes, max-nodes
+- num-nodes, min-nodes, max-nodes (for a large crawl you may want up to 15 nodes, this is different than the number of pods which is specificed by the parallelism field in the crawl.yaml - one node can host multiple pods)
 - [machine-type](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
 - See the [GKE Quickstart](https://cloud.google.com/kubernetes-engine/docs/quickstart) guide and [cluster create](https://cloud.google.com/sdk/gcloud/reference/container/clusters/create) documentation.
 
@@ -165,7 +165,7 @@ envsubst < ./crawl.tmpl.yaml > crawl.yaml
 ```
 
 Use of `envsubst` has already replaced `$REDIS_HOST` with the value of the env var set previously, but you may still want to adapt `crawl.yaml`:
-- spec.parallelism
+- spec.parallelism  (this is the number of pods that can be used - many pods can fit on one node, kubernetes will manage this based on the resources used by any given set of pods on a node)
 - spec.containers.image
 - spec.containers.env
 - spec.containers.resources
