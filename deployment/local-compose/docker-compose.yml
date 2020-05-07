@@ -1,0 +1,22 @@
+version: "3"
+services:
+    crawler:
+        image: openwpm:latest
+        command: ["python3", "crawler.py"]
+        environment:
+            - S3_ENDPOINT=http://localstack:4572
+            - REDIS_HOST=redis
+            - CRAWL_DIRECTORY=local-crawl
+            - DISPLAY=${DISPLAY}
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        shm_size: 2G
+        depends_on:
+            - redis
+            - localstack
+    redis:
+        image: redis:latest
+    localstack:
+        image: localstack/localstack
+        environment:
+            - SERVICES=s3

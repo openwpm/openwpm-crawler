@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-if [[ "$REDIS_HOST" == "" ]]; then
+
+if [[ "$REDIS_HOST" == "" ]] && [[ "$REDIS_CONTAINER" == "" ]]; then
     echo "The env var REDIS_HOST needs to be set with the IP/hostname of the managed Redis instance" >&2
     echo "Assuming we are testing locally and setting REDIS_HOST to localhost." >&2
     REDIS_HOST="localhost"
@@ -27,7 +28,13 @@ echo "DEL $REDIS_QUEUE_NAME:retries" >> joblist.txt
 # awk #1 = Add the RPUSH command with the site value within single quotes
 cat "$SITE_LIST_CSV" | tr -d '\r' | sed '1!G;h;$!d' | sed "s/'/\\\'/g" | awk -F ',' 'FNR > 0 {print "RPUSH '$REDIS_QUEUE_NAME' '\''"$1","$2"'\''"}' >> joblist.txt
 
-kubectl cp joblist.txt redis-box:/tmp/joblist.txt
-kubectl exec redis-box -- sh -c "cat /tmp/joblist.txt | redis-cli -h $REDIS_HOST --pipe"
+
+if [[ "$REDIS_HOST" != "" ]]; then 
+    kubectl cp joblist.txt redis-box:/tmp/joblist.txt
+    kubectl exec redis-box -- sh -c "cat /tmp/joblist.txt | redis-cli -h $REDIS_HOST --pipe"
+else
+    docker cp joblist.txt $REDIS_CONTAINER:/tmp/joblist.txt 
+    docker exec $REDIS_CONTAINER sh -c "cat /tmp/joblist.txt | redis-cli --pipe"
+fi 
 
 rm joblist.txt

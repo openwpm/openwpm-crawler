@@ -78,3 +78,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# Crawl Atrifacts
+joblist.txt
+crawl-data
