@@ -97,6 +97,10 @@ cd ../../; python -m utilities.get_sampled_sites; cd -
 ```
 
 ## Starting the crawl
+
+Depending on whether or not you want to save all web content your visiting you should
+edit the `docker-compose.yml` to set `SAVE_CONTENT` to `1` if you want to save everything out or look
+at the OpenWPM README for more information on this option
 Assuming you have setup the redis-queue all that is left to do is
 ```
 docker-compose up -d crawler

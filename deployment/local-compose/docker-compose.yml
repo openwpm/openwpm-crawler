@@ -8,6 +8,7 @@ services:
             - REDIS_HOST=redis
             - CRAWL_DIRECTORY=local-crawl
             - DISPLAY=${DISPLAY}
+            - SAVE_CONTENT=0
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
         shm_size: 2G
