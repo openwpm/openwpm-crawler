@@ -40,7 +40,7 @@ spec:
         - name: CRAWL_DIRECTORY
           value: 'openwpm-crawl'
         - name: S3_BUCKET
-          value: 'openwpm-crawls'
+          value: 'openwpm-data'
         - name: HTTP_INSTRUMENT
           value: '1'
         - name: COOKIE_INSTRUMENT
