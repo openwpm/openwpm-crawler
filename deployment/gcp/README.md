@@ -92,14 +92,14 @@ Then run:
 ## (Optional) Build and push Docker image to GCR
 
 If one of [the pre-built OpenWPM Docker images](https://hub.docker.com/r/openwpm/openwpm/tags) are not sufficient:
-```
+```bash
 cd path/to/OpenWPM
-docker build -t gcr.io/$PROJECT/openwpm .
+docker build -t gcr.io/$PROJECT/$CRAWL_PREFIX-openwpm .
 cd -
 gcloud auth configure-docker
-docker push gcr.io/$PROJECT/openwpm
+docker push gcr.io/$PROJECT/$CRAWL_PREFIX-openwpm
 ```
-Remember to change the `crawl.yaml` to point to `image: gcr.io/$PROJECT/openwpm`.
+Remember to change the `crawl.yaml` to point to `image: gcr.io/$PROJECT/$CRAWL_PREFIX-openwpm`.
 
 ## Deploy the redis server which we use for the work queue
 

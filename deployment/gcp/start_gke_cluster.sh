@@ -10,8 +10,7 @@ ADDITIONAL_ARGS="${*:2}"
 
 gcloud container clusters create $CLUSTER_NAME \
 --zone us-central1-f \
---enable-cloud-logging \
---enable-cloud-monitoring \
+--enable-stackdriver-kubernetes \
 --labels='app=openwpm' \
 --machine-type=n1-highcpu-16 \
 --num-nodes=1 \
