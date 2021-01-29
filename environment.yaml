@@ -1,0 +1,16 @@
+name: openwpm-crawler
+channels:
+- conda-forge
+- main
+dependencies:
+- requests
+- redis
+- s3cmd
+# for analysis
+- ipykernel
+- flake8-isort
+- jupyter
+- pip
+- ipython
+- pip:
+    - openwpm-utils
