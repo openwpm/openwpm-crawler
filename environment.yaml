@@ -14,3 +14,4 @@ dependencies:
 - ipython
 - pip:
     - openwpm-utils
+    - gcloud

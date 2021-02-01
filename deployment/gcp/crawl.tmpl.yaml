@@ -23,24 +23,16 @@ spec:
           - mountPath: /dev/shm
             name: dshm
         env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: aws-config
-              key: aws_access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: aws-config
-              key: aws_secret_access_key
         - name: REDIS_HOST
           value: '$REDIS_HOST'
         - name: REDIS_QUEUE_NAME
           value: 'crawl-queue'
         - name: CRAWL_DIRECTORY
-          value: '2020-08-25_ETP2'
-        - name: S3_BUCKET
-          value: 'openwpm-data'
+          value: '2021-02-01-StorageControllerTest-1'
+        - name: GCS_BUCKET
+          value: 'openwpm-test-bucket'
+        - name: GCP_PROJECT
+          value: '$PROJECT'
         - name: HTTP_INSTRUMENT
           value: '1'
         - name: COOKIE_INSTRUMENT
