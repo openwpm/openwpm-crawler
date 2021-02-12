@@ -82,3 +82,5 @@ docs/_build/
 # Crawl Atrifacts
 joblist.txt
 crawl-data
+
+.vscode
