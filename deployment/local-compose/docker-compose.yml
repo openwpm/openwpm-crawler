@@ -1,7 +1,7 @@
 version: "3"
 services:
     crawler:
-        image: openwpm-parquet:latest
+        image: openwpm:latest
         command: ["python3", "crawler.py"]
         environment:
             - S3_ENDPOINT=http://localstack:4572
