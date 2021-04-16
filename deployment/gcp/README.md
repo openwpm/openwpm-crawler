@@ -74,21 +74,6 @@ To run crawls without Sentry, remove the following from the crawl config after i
               key: sentry_dsn
 ```
 
-## (One time)  Allow the cluster to access AWS S3
-
-Make sure that your AWS credentials are stored in `~/.aws/credentials` as per:
-
-```
-aws_access_key_id = FOO
-aws_secret_access_key = BAR
-```
-
-Then run:
-
-```
-./aws_credentials_as_kubectl_secrets.sh
-```
-
 ## (Optional) Build and push Docker image to GCR
 
 If one of [the pre-built OpenWPM Docker images](https://hub.docker.com/r/openwpm/openwpm/tags) are not sufficient:
