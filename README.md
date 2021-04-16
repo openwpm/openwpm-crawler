@@ -1,4 +1,4 @@
-# OpenWPM Crawler 
+# OpenWPM Crawler
 
 Launch OpenWPM crawls using Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/) workloads
 or stand up some docker-compose services to run the crawl in a distributed fashion.
@@ -11,14 +11,11 @@ and exit once there are no additional sites in the queue.
 
 ## Preparations
 
-```
-./setup-python-venv.sh
-```
+To install all the required tools (using conda)
 
-Due to a bug with `plyvel` and recent versions of Mac OSX, use the following if you are on a Mac:
-
-```
-./setup-python-venv-mac.sh
+```bash
+./install.sh
+conda activate openwpm-crawler
 ```
 
 ## Run a crawl locally (using Kubernetes)
@@ -38,7 +35,7 @@ cloud crawls.
 
 ## Analyze crawl results
 
-```
+```bash
 jupyter notebook
 ```
 
