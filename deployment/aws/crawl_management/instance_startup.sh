@@ -2,7 +2,7 @@
 output: {{all: '| tee -a /var/log/cloud-init-output.log'}}
 
 runcmd:
- - git clone https://github.com/mozilla/openwpm-crawler.git /home/ubuntu/openwpm-crawler
+ - git clone https://github.com/openwpm/openwpm-crawler.git /home/ubuntu/openwpm-crawler
  - git -C /home/ubuntu/openwpm-crawler checkout {}
  - git -C /home/ubuntu/openwpm-crawler submodule init
  - git -C /home/ubuntu/openwpm-crawler submodule update
