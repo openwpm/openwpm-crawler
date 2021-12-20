@@ -296,4 +296,4 @@ gcloud container clusters delete $CRAWL_PREFIX-cluster
 
 ### Troubleshooting
 
-In case of any unexpected issues, rinse (clean up) and repeat. If the problems remain, file an issue against https://github.com/mozilla/openwpm-crawler.
+In case of any unexpected issues, rinse (clean up) and repeat. If the problems remain, file an issue against https://github.com/openwpm/openwpm-crawler.
